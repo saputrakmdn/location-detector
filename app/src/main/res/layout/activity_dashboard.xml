@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background"
+    android:id="@+id/activity_main"
     tools:context=".dashboard">
 
     <LinearLayout
@@ -61,6 +62,7 @@
                 android:layout_columnWeight="1"
                 android:layout_rowWeight="1"
                 app:cardElevation="8dp"
+                android:id="@+id/cardMasuk"
                 app:cardCornerRadius="15dp"
                 android:layout_margin="10dp">
                 <LinearLayout
@@ -76,8 +78,9 @@
                     <TextView
                         android:layout_marginTop="12dp"
                         android:textSize="13sp"
-                        android:text="Presensi Masuk"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/text_masuk"
+                        android:text="Anda harus berada di radius 10 meter"
+                        android:layout_width="100dp"
                         android:layout_height="wrap_content" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -89,6 +92,7 @@
                 android:layout_rowWeight="1"
                 app:cardElevation="8dp"
                 app:cardCornerRadius="15dp"
+                android:id="@+id/cardPulang"
                 android:layout_margin="10dp">
                 <LinearLayout
                     android:orientation="vertical"
@@ -103,8 +107,9 @@
                     <TextView
                         android:layout_marginTop="12dp"
                         android:textSize="13sp"
-                        android:text="Presensi Pulang"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/text_pulang"
+                        android:text="Anda harus berada di radius 10 meter"
+                        android:layout_width="100dp"
                         android:layout_height="wrap_content" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -143,6 +148,7 @@
                 android:layout_rowWeight="1"
                 app:cardElevation="8dp"
                 app:cardCornerRadius="15dp"
+                android:id="@+id/profile_card"
                 android:layout_margin="10dp">
                 <LinearLayout
                     android:orientation="vertical"
@@ -201,5 +207,4 @@
 
         </GridLayout>
     </LinearLayout>
-
 </ScrollView>
