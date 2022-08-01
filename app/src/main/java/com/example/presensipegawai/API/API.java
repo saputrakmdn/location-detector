@@ -21,7 +21,7 @@ public interface API {
     Call<Presensi> absenMasuk(@Header("Authorization") String token, @Field("latitude") double latitude, @Field("longtitude") double longtitude);
     @POST("/api/presensi-pulang")
     @FormUrlEncoded
-    Call<Presensi> absenPulang(@Header("Authorization") String token, @Field("id_presensi") int id_presensi);
+    Call<Presensi> absenPulang(@Header("Authorization") String token, @Field("latitude") double latitude, @Field("longtitude") double longtitude);
     @GET("/api/user")
     Call<Pegawai> getProfile(@Header("Authorization") String token);
 }

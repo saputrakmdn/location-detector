@@ -3,6 +3,7 @@ package com.example.presensipegawai;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
@@ -29,6 +30,8 @@ import com.example.presensipegawai.Models.TokenAPI;
 import com.example.presensipegawai.Services.GPSService;
 import com.example.presensipegawai.Services.Utils;
 import com.example.presensipegawai.SharePref.SharPref;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -38,6 +41,7 @@ public class login extends AppCompatActivity {
 
     EditText Username, Password;
     Button Btnlogin;
+    AlertDialog materialAlertDialogBuilder;
     private API apiService;
     private SharPref sharPref;
 
@@ -49,6 +53,7 @@ public class login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         sharPref = new SharPref(this);
+        materialAlertDialogBuilder = new MaterialAlertDialogBuilder(this).setView(R.layout.loading).create();
 
         Username = findViewById(R.id.et_username);
         Password = findViewById(R.id.et_password);
@@ -75,9 +80,12 @@ public class login extends AppCompatActivity {
                     Password.setError("Password Wajib Diisi");
                     return;
                 }
+
+                materialAlertDialogBuilder.show();
                 apiService.login(email, password, "android").enqueue(new Callback<TokenAPI>() {
                     @Override
                     public void onResponse(Call<TokenAPI> call, Response<TokenAPI> response) {
+                        materialAlertDialogBuilder.dismiss();
                         if(response.body().getCode() == 404){
                             Username.setError("Username Salah");
                             Password.setError("Password salah");

@@ -120,6 +120,7 @@
                 android:layout_columnWeight="1"
                 android:layout_rowWeight="1"
                 app:cardElevation="8dp"
+                android:id="@+id/cardIzin"
                 app:cardCornerRadius="15dp"
                 android:layout_margin="10dp">
                 <LinearLayout

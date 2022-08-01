@@ -4,6 +4,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
@@ -34,12 +35,15 @@ import android.widget.Toast;
 
 import com.example.presensipegawai.API.API;
 import com.example.presensipegawai.API.APIUtility;
+import com.example.presensipegawai.Models.ErrorResponse;
 import com.example.presensipegawai.Models.Presensi;
 import com.example.presensipegawai.Models.TokenAPI;
 import com.example.presensipegawai.Services.GPSService;
 import com.example.presensipegawai.Services.Utils;
 import com.example.presensipegawai.SharePref.SharPref;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.Gson;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -51,8 +55,8 @@ public class dashboard extends AppCompatActivity implements SharedPreferences.On
 
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
 
-    private static final double lat1 = -6.2402437;
-    private static final double long1 = 106.6690663;
+    private static final double lat1 = -6.0896117;
+    private static final double long1 = 106.6668433;
 
     private MyReceiver myReceiver;
 
@@ -65,11 +69,14 @@ public class dashboard extends AppCompatActivity implements SharedPreferences.On
     private CardView cardPulang;
     private TextView textPulang;
     private CardView profile;
+    private CardView izinKeluar;
 
     private API apiService;
     private SharPref sharPref;
     private Double longtitude = 0.00;
     private Double latitude = 0.00;
+
+    AlertDialog materialAlertDialogBuilder;
 
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -112,17 +119,27 @@ public class dashboard extends AppCompatActivity implements SharedPreferences.On
             }
         }
         setContentView(R.layout.activity_dashboard);
+        materialAlertDialogBuilder = new MaterialAlertDialogBuilder(this).setView(R.layout.loading).create();
         sharPref = new SharPref(this);
         apiService = APIUtility.getAPI();
         cardMasuk = findViewById(R.id.cardMasuk);
         cardPulang = findViewById(R.id.cardPulang);
         profile = findViewById(R.id.profile_card);
+        izinKeluar = findViewById(R.id.cardIzin);
+        izinKeluar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent dashboard = new Intent(dashboard.this, izin_keluar.class);
+                startActivity(dashboard);
+            }
+        });
         //absen masuk
         cardMasuk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "onClick: "+getLatitude());
+                materialAlertDialogBuilder.show();
                 if(getLatitude().equals(0.00)){
+                    materialAlertDialogBuilder.dismiss();
                     Snackbar.make(
                             findViewById(R.id.activity_main),
                             "Lokasi tidak terdeteksi. Mohon coba lagi",
@@ -132,8 +149,17 @@ public class dashboard extends AppCompatActivity implements SharedPreferences.On
                     apiService.absenMasuk("Bearer "+sharPref.getTokenApi(), getLatitude(), getLongtitude()).enqueue(new Callback<Presensi>() {
                         @Override
                         public void onResponse(Call<Presensi> call, Response<Presensi> response) {
-                            sharPref.setIdPresensi(response.body().getIdPresensi());
-                            Log.d("reponse post", "onResponse: "+response.body().getIdPegawai());
+                            materialAlertDialogBuilder.dismiss();
+                            if (response.code() == 200){
+                                sharPref.setIdPresensi(response.body().getIdPresensi());
+                                Log.i("Response", response.body().toString());
+                                showDialogSuccess();
+                            }
+                            if (response.code() == 423){
+                                Gson gson = new Gson();
+                                ErrorResponse message=gson.fromJson(response.errorBody().charStream(),ErrorResponse.class);
+                                Toast.makeText(dashboard.this, message.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
                         }
 
                         @Override
@@ -149,17 +175,38 @@ public class dashboard extends AppCompatActivity implements SharedPreferences.On
         cardPulang.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                apiService.absenPulang("Bearer "+sharPref.getTokenApi(), sharPref.getIdPresensi()).enqueue(new Callback<Presensi>() {
-                    @Override
-                    public void onResponse(Call<Presensi> call, Response<Presensi> response) {
+                materialAlertDialogBuilder.show();
+                if(getLatitude().equals(0.00)){
+                    materialAlertDialogBuilder.dismiss();
+                    Snackbar.make(
+                            findViewById(R.id.activity_main),
+                            "Lokasi tidak terdeteksi. Mohon coba lagi",
+                            Snackbar.LENGTH_SHORT)
+                            .show();
+                }else {
+                    apiService.absenPulang("Bearer " + sharPref.getTokenApi(), getLatitude(), getLongtitude()).enqueue(new Callback<Presensi>() {
+                        @Override
+                        public void onResponse(Call<Presensi> call, Response<Presensi> response) {
+                            materialAlertDialogBuilder.dismiss();
+                            if (response.code() == 200){
+                                sharPref.setIdPresensi(response.body().getIdPresensi());
+                                Log.i("Response", response.body().toString());
+                                showDialogSuccess();
+                            }
 
-                    }
+                            if (response.code() == 423){
+                                Gson gson = new Gson();
+                                ErrorResponse message=gson.fromJson(response.errorBody().charStream(),ErrorResponse.class);
+                                Toast.makeText(dashboard.this, message.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
 
-                    @Override
-                    public void onFailure(Call<Presensi> call, Throwable t) {
+                        @Override
+                        public void onFailure(Call<Presensi> call, Throwable t) {
 
-                    }
-                });
+                        }
+                    });
+                }
             }
         });
 
@@ -319,12 +366,16 @@ public class dashboard extends AppCompatActivity implements SharedPreferences.On
             double radius = getRadius(lat1, long1, location.getLatitude(), location.getLongitude());
             Log.d("location jarak", Double.toString(radius));
 
-            if(location != null && radius < 10){
+            if(location != null && radius < 10.00){
                 cardMasuk.setEnabled(true);
                 textMasuk.setText("Presensi Masuk");
+                cardPulang.setEnabled(true);
+                textPulang.setText("Presensi Pulang");
             }else{
                 cardMasuk.setEnabled(false);
                 textMasuk.setText("Anda harus berada di radius 10 meter");
+                cardPulang.setEnabled(false);
+                textPulang.setText("Anda harus berada di radius 10 meter");
 //                Toast.makeText(login.this, Utils.getLocationText(location),
 ////                        Toast.LENGTH_SHORT).show();
             }
@@ -373,5 +424,15 @@ public class dashboard extends AppCompatActivity implements SharedPreferences.On
         loc2.setLongitude(lng2);
         double distanceInMeters = loc1.distanceTo(loc2);
         return distanceInMeters;
+    }
+
+    private void showDialogSuccess(){
+        MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(dashboard.this).setTitle("Absen Berhasil").setPositiveButton("OK",null);
+        materialAlertDialogBuilder.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
     }
 }

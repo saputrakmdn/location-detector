@@ -25,6 +25,9 @@ public class Presensi {
     @SerializedName("id_presensi")
     @Expose
     private int id_presensi;
+    @SerializedName("message")
+    @Expose
+    private String message;
 
     public void setIdPegawai(int id_pegawai) {
         this.id_pegawai = id_pegawai;
@@ -80,5 +83,13 @@ public class Presensi {
 
     public int getIdPresensi() {
         return id_presensi;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }
