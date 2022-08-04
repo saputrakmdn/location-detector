@@ -1,5 +1,6 @@
 package com.example.presensipegawai.API;
 
+import com.example.presensipegawai.Models.IzinKeluar;
 import com.example.presensipegawai.Models.Pegawai;
 import com.example.presensipegawai.Models.Presensi;
 import com.example.presensipegawai.Models.TokenAPI;
@@ -24,4 +25,7 @@ public interface API {
     Call<Presensi> absenPulang(@Header("Authorization") String token, @Field("latitude") double latitude, @Field("longtitude") double longtitude);
     @GET("/api/user")
     Call<Pegawai> getProfile(@Header("Authorization") String token);
+    @POST("/api/izin-keluar")
+    @FormUrlEncoded
+    Call<IzinKeluar> izinKeluar(@Header("Authorization") String token, @Field("id_presensi") int id_presensti, @Field("keterangan") String keterangan);
 }

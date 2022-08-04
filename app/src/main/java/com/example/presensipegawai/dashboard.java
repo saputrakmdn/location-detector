@@ -55,8 +55,8 @@ public class dashboard extends AppCompatActivity implements SharedPreferences.On
 
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
 
-    private static final double lat1 = -6.0896117;
-    private static final double long1 = 106.6668433;
+    private static final double lat1 = -6.183252;
+    private static final double long1 = 106.6313806;
 
     private MyReceiver myReceiver;
 

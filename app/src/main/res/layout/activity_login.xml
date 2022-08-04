@@ -54,5 +54,13 @@
             android:textSize="14sp"
             android:textColor="@color/black"/>
     </LinearLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_login"
+        android:text="Login"
+        android:textAllCaps="false"
+        android:layout_gravity="center"
+        android:layout_marginTop="15dp"/>
 
 </LinearLayout>
